@@ -5,8 +5,12 @@ module.exports = app => {
     let logger = app.middlewares.log.logger;
     let options = app.hassio.config.options;
     
+    // Parse host and port from mqtt_host
+    const [host, port] = (options.mqtt_host || '').split(':');
+    
     let mqttClient = mqtt.connect({
-        host: options.mqtt_host,
+        host: host || 'localhost',
+        port: parseInt(port || '1883', 10),
         username: options.mqtt_user,
         password: options.mqtt_password,
         resubscribe: true,
@@ -18,6 +22,10 @@ module.exports = app => {
 
     mqttClient.on("error", (error) => {
         logger.error("[MQTT] error", error)
+    })
+
+    mqttClient.on("connect", () => {
+        logger.info("[MQTT] Connected successfully")
     })
 
     return mqttClient
