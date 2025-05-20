@@ -7,7 +7,11 @@ module.exports = app => {
 
     // Check if options file exists
     if (!fs.existsSync(optionsPath)) {
-        throw new Error(`Configuration file not found: ${optionsPath}. Please ensure the file exists and contains valid configuration.`);
+        if (isProduction) {
+            throw new Error(`Configuration file not found: ${optionsPath}. Please ensure the file exists and contains valid configuration.`);
+        } else {
+            throw new Error(`Development configuration file not found: ${optionsPath}. Please copy options-mock-example.json to options-mock.json and update with your configuration.`);
+        }
     }
 
     try {
